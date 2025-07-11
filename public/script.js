@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
             loadingText.textContent = `Checking ${checkedCount} of ${proxies.length}...`;
 
             try {
-                const res = await fetch(`/api/check?proxy=${encodeURIComponent(proxy)}`);
+                const res = await fetch(`/api/helpers?proxy=${encodeURIComponent(proxy)}`);
                 const data = await res.json();
                 renderResult(data, index);
             } catch (e) {
@@ -125,35 +125,4 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>`;
         resultBody.innerHTML += cardHtml;
     }
-
-    // --- Event Listener untuk Tombol Gemini ---
-    resultBody.addEventListener('click', async (event) => {
-        const button = event.target.closest('.gemini-btn');
-        if (!button) return;
-
-        const country = button.dataset.country;
-        const org = button.dataset.org;
-        const index = button.dataset.index;
-        const resultDiv = document.getElementById(`gemini-result-${index}`);
-
-        button.disabled = true;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menganalisis...';
-        resultDiv.classList.remove('hidden');
-        resultDiv.innerHTML = 'Menghubungi Gemini...';
-
-        try {
-            const response = await fetch(`/api/suggest?country=${encodeURIComponent(country)}&organization=${encodeURIComponent(org)}`);
-            if (!response.ok) {
-                throw new Error('Gagal mendapatkan respons dari server.');
-            }
-            const suggestionsHtml = await response.text();
-            resultDiv.innerHTML = suggestionsHtml;
-            button.style.display = 'none';
-
-        } catch (error) {
-            resultDiv.innerHTML = `<p class="text-red-400">Maaf, terjadi kesalahan: ${error.message}</p>`;
-            button.disabled = false;
-            button.innerHTML = '<i class="fas fa-magic"></i> ✨ Coba Lagi Sarankan Kegunaan';
-        }
-    });
 });
