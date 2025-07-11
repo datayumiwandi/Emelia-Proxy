@@ -1,0 +1,14 @@
+{
+    "name": "yumiproxy",
+    "version": "1.0.0",
+    "description": "Konfigurasi untuk menjalankan server Vercel secara lokal.",
+    "scripts": {
+      "dev": "vercel dev"
+    },
+    "author": "mayumi",
+    "license": "ISC",
+    "devDependencies": {
+      "vercel": "^32.5.0"
+    }
+  }
+  

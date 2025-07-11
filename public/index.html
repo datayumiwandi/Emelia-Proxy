@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy Checker Yumi ✨ with Gemini</title>
+    <!-- Meta tags lainnya bisa Anda salin dari file lama -->
+    
+    <!-- Memuat Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a;
+            background-image: radial-gradient(at 47% 33%, hsl(262.35, 83%, 7%) 0, transparent 59%),
+                radial-gradient(at 82% 65%, hsl(218.18, 39%, 11%) 0, transparent 55%);
+        }
+        .glassmorphism {
+            background: rgba(17, 25, 40, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.125);
+        }
+        .shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .shine::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: rotate(30deg);
+            transition: 0.6s;
+            opacity: 0;
+        }
+        .shine:hover::after {
+            opacity: 1;
+            transition: 0s;
+        }
+        .gemini-suggestions ul {
+            list-style-position: inside;
+            padding-left: 0.5rem;
+        }
+        .gemini-suggestions li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* === [FINAL] CSS untuk Logo & Animasi Bola Api === */
+        .fire-logo-container {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fire-logo {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            background-color: #1e293b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9333ea;
+            font-size: 24px;
+            border: 2px solid white; /* Border putih statis */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .orbit-path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            animation: spin 4s linear infinite; /* Semua berputar searah jarum jam */
+        }
+        
+        .fire-orb {
+            position: absolute;
+            top: -5px; 
+            left: calc(50% - 8px);
+            width: 16px;
+            height: 10px;
+            border-radius: 50%;
+            /* Gradient untuk efek kepala api dan ekor */
+            background: radial-gradient(circle at 25% 50%, #ffeb3b, #ff9800 60%, transparent 80%);
+            animation: flicker 1.2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes flicker {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 7px #ffc107, 0 0 12px #ff9800, 0 0 18px #f44336;
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(0.95);
+                box-shadow: 0 0 5px #ffc107, 0 0 10px #ff9800, 0 0 15px #f44336, 0 0 20px #ff5722;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-100 py-8 px-4 sm:px-6 relative">
+
+    <!-- === Logo dengan Animasi Bola Api yang Diperbarui === -->
+    <div class="fire-logo-container">
+        <div class="fire-logo">
+            <img 
+        src="https://yumicftigarun.web.id/asset/image/wandi-foto.png" 
+        alt="Logo Yumi Mayumi" 
+        class="w-3/4 h-3/4 object-contain"
+    >
+        </div>
+        <!-- Orbit untuk bola api pertama -->
+        <div class="orbit-path">
+            <div class="fire-orb"></div>
+        </div>
+        <!-- Orbit untuk bola api kedua (searah jarum jam, posisi berbeda) -->
+        <div class="orbit-path" style="animation-delay: -2s;"> <!-- Mulai dari sisi seberang -->
+            <div class="fire-orb"></div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Input Section -->
+        <div class="glassmorphism p-6 mb-8 mt-16 sm:mt-0">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-terminal text-purple-400 mr-2"></i>
+                <h2 class="text-xl font-semibold text-white">Enter Proxy Details</h2>
+            </div>
+            <div class="relative">
+                <textarea id="proxy-input" rows="3"
+                    class="w-full px-4 py-3 bg-gray-900/50 text-gray-100 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none shadow-inner"
+                    placeholder="Format: IP:PORT, https://IP:PORT, IP,PORT/"></textarea>
+                <div class="absolute right-3 bottom-3 flex gap-1 text-xs text-gray-400">
+                    <span id="proxy-count">0/20</span>
+                </div>
+            </div>
+            <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div class="flex gap-2">
+                    <button id="example-btn" class="text-sm px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded transition-colors flex items-center"><i class="far fa-lightbulb mr-1"></i> Examples</button>
+                    <button id="clear-btn" class="text-sm px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded transition-colors flex items-center"><i class="fas fa-eraser mr-1"></i> Clear</button>
+                </div>
+                <button id="check-proxies" class="shine w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium py-2 px-6 rounded-lg transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+                    <i class="fas fa-search-location"></i>
+                    <span>Check Proxies</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Animasi Loading -->
+        <div id="loading" class="hidden glassmorphism p-10 mb-8 text-center">
+            <div class="flex justify-center items-center mb-4 space-x-2">
+                <span class="animate-pulse inline-block w-4 h-4 bg-purple-500 rounded-full"></span>
+                <span class="animate-pulse inline-block w-4 h-4 bg-indigo-500 rounded-full" style="animation-delay: 0.2s;"></span>
+                <span class="animate-pulse inline-block w-4 h-4 bg-blue-500 rounded-full" style="animation-delay: 0.4s;"></span>
+            </div>
+            <p id="loading-text" class="text-gray-300 text-lg">Checking proxies...</p>
+            <div class="w-full bg-gray-700 h-1.5 rounded-full mt-4 overflow-hidden">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="result-container" class="hidden space-y-6">
+            <div id="result-body" class="grid gap-5">
+                <!-- Hasil akan ditampilkan di sini oleh JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- === Footer yang Diperbarui === -->
+    <footer class="text-center text-sm text-gray-400 mt-10">
+        <div class="mb-2">
+            &copy; 2025 Proxy Checker. 
+            Powered by <a href="https://t.me/Yumi_yui" target="_blank" class="text-indigo-400 hover:underline">Yumi</a>.
+        </div>
+        <div class="flex justify-center items-center space-x-5">
+            <a href="https://www.instagram.com/yumifantasy/" target="_blank" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-instagram fa-lg"></i></a>
+            <a href="https://www.tiktok.com/@mayumiwandi" target="_blank" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-tiktok fa-lg"></i></a>
+            <a href="https://t.me/Yumi_yui" target="_blank" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-telegram fa-lg"></i></a>
+            <a href="https://github.com/mayumiwandi" target="_blank" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-github fa-lg"></i></a>
+        </div>
+    </footer>
+
+    <!-- Panggil skrip eksternal kita -->
+    <script src="script.js"></script>
+</body>
+</html>
